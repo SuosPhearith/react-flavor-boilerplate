@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Kantumruy';
+  src: url('./assets/fonts/Kantumruy.ttf') format('truetype');
+}
+
+:root {
+  font-family: 'Kantumruy', sans-serif !important;
+}
+
+* {
+  font-family: 'Kantumruy', sans-serif !important;
+}
