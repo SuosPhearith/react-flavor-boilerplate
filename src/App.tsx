@@ -7,125 +7,147 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { Layout, Menu, theme } from "antd";
-import logoImage from "./assets/images/logo.svg";
+import { Layout, Menu } from "antd";
 import { RxDashboard } from "react-icons/rx";
-import { GrBook, GrDocumentPdf, GrDocumentVideo } from "react-icons/gr";
-import LoginScreen from "./screens/LoginScreen";
-import DashboardScreen from "./screens/DashboardScreen";
 import { IoIosArrowForward } from "react-icons/io";
 import { LiaUser } from "react-icons/lia";
 import { IoSettingsOutline } from "react-icons/io5";
-import { TbGridDots } from "react-icons/tb";
+import { TbGridDots, TbUserSquare } from "react-icons/tb";
 import { GoBell } from "react-icons/go";
-import { ItemType, MenuItemType } from "antd/es/menu/interface";
+import LoginScreen from "./screens/LoginScreen";
+import DashboardScreen from "./screens/DashboardScreen";
+import logoImage from "./assets/images/logo.svg";
+import ItemScreen from "./screens/ItemScreen";
+import { ROUTES } from "./routes";
+import UserScreen from "./screens/UserScreen";
+import { BsBox } from "react-icons/bs";
 
 const { Sider, Content } = Layout;
 
-const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
+interface MenuItem {
+  key: string;
+  icon: React.ReactNode;
+  label: React.ReactNode;
+}
 
-  // 🔄 Use useLocation to get the current URL path
+// Sidebar Component
+const Sidebar: React.FC<{
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+}> = ({ collapsed, toggleCollapsed }) => {
   const location = useLocation();
 
-  // 🗂 Define the menu items
-  const items: ItemType<MenuItemType>[] = [
+  const menuItems: MenuItem[] = [
     {
-      key: "/",
-      icon: <RxDashboard />,
-      label: <Link to="/">ផ្ទាំងគ្រប់គ្រងទូទៅ</Link>,
+      key: ROUTES.home,
+      icon: <RxDashboard size={16} />,
+      label: <Link to={ROUTES.home}>ផ្ទាំងគ្រប់គ្រងទូទៅ</Link>,
     },
     {
-      key: "/document",
-      icon: <GrDocumentVideo />,
-      label: <Link to="/document">ឯកសារជំនួយ</Link>,
+      key: ROUTES.item,
+      icon: <BsBox size={16} />,
+      label: <Link to={ROUTES.item}>ទំនិញ</Link>,
     },
     {
-      key: "/book",
-      icon: <GrBook />,
-      label: <Link to="/book">សៀវភៅកិច្ចតែងការ</Link>,
-    },
-    {
-      key: "/worksheet",
-      icon: <GrDocumentPdf />,
-      label: <Link to="/worksheet">សន្លឹកកិច្ចការ</Link>,
+      key: ROUTES.user,
+      icon: <TbUserSquare size={18} />,
+      label: <Link to={ROUTES.user}>អ្នកប្រើប្រាស់</Link>,
     },
   ];
 
   return (
-    <Layout style={{ height: "100vh" }}>
-      <Sider
+    <Sider
+      theme="light"
+      collapsible
+      collapsed={collapsed}
+      trigger={null}
+      className="shadow-md h-screen overflow-auto relative transition-all duration-300"
+      width={220}
+    >
+      <div className="flex items-center justify-center h-16 my-4">
+        <img src={logoImage} alt="logo" className="w-10 h-10" />
+        {!collapsed && (
+          <span className="ml-2 text-xl font-semibold text-blue-600">IMS</span>
+        )}
+      </div>
+      <Menu
         theme="light"
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-        className="overflow-auto h-screen relative"
-        style={{ paddingBottom: "56px" }} // Reserve space for the fixed toggle
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        items={menuItems}
+        className="border-r-0"
+      />
+      <div
+        onClick={toggleCollapsed}
+        className={`absolute bottom-0 w-full p-3 flex justify-center items-center bg-white hover:bg-blue-50 cursor-pointer transition-colors duration-200`}
       >
-        <div className="w-full h-12 flex justify-center items-center my-4 cursor-pointer">
-          <img className="w-[40px]" src={logoImage} alt="logo" />
-          {!collapsed && (
-            <div className="text-2xl font-bold ml-2 text-blue-600">IMS</div>
-          )}
-        </div>
-        <Menu
-          theme="light"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={items}
+        <IoIosArrowForward
+          size={20}
+          className={`text-blue-600 ${
+            collapsed ? "" : "rotate-180"
+          } transition-transform duration-200`}
         />
-        <div className="h-[50px]"></div>
-        <div
-          onClick={() => setCollapsed(!collapsed)}
-          className={`fixed bottom-0 ${
-            collapsed ? "w-[80px]" : "w-[200px]"
-          } p-3 flex justify-center items-center bg-white hover:bg-[#E6F4FF] cursor-pointer`}
-        >
-          {collapsed ? (
-            <IoIosArrowForward size={20} color="blue" />
-          ) : (
-            <IoIosArrowForward
-              color="blue"
-              size={20}
-              style={{ transform: "rotate(180deg)" }}
-            />
-          )}
-        </div>
-      </Sider>
+      </div>
+    </Sider>
+  );
+};
 
-      <Layout>
-        <div className="bg-white py-2 px-[16px] flex items-center justify-end gap-2">
-          <div className="flex items-center gap-3">
-            <GoBell size={20} className="cursor-pointer hover:text-blue-600" />
-            <IoSettingsOutline
-              size={20}
-              className="cursor-pointer hover:text-blue-600"
-            />
-            <div className="w-[30px] h-[30px] bg-slate-300 rounded-full flex justify-center items-center">
-              <LiaUser size={24} />
-            </div>
-            <TbGridDots
-              size={20}
-              className="cursor-pointer hover:text-blue-600"
-            />
-          </div>
+// Header Component
+const Header: React.FC = () => (
+  <div className="bg-white shadow-sm py-3 px-6 flex items-center justify-end gap-4">
+    <div className="flex items-center gap-4">
+      <GoBell
+        className="text-gray-600 hover:text-blue-600 cursor-pointer transition-colors duration-200"
+        size={20}
+      />
+      <IoSettingsOutline
+        className="text-gray-600 hover:text-blue-600 cursor-pointer transition-colors duration-200"
+        size={20}
+      />
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+          <LiaUser size={20} className="text-gray-600" />
         </div>
+        <span className="text-sm font-medium text-gray-700">John Doe</span>
+      </div>
+      <TbGridDots
+        className="text-gray-600 hover:text-blue-600 cursor-pointer transition-colors duration-200"
+        size={20}
+      />
+    </div>
+  </div>
+);
+
+// Main App Component
+const App: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(() => {
+    // Initialize from localStorage, default to false if not set
+    const storedValue = localStorage.getItem("sidebarCollapsed");
+    return storedValue ? JSON.parse(storedValue) : false;
+  });
+
+  // Update localStorage whenever collapsed changes
+  React.useEffect(() => {
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(collapsed));
+  }, [collapsed]);
+
+  return (
+    <Layout className="min-h-screen">
+      <Sidebar
+        collapsed={collapsed}
+        toggleCollapsed={() => setCollapsed(!collapsed)}
+      />
+      <Layout>
+        <Header />
         <Content
-          style={{
-            margin: "10px",
-            padding: 10,
-            minHeight: 280,
-            borderRadius: borderRadiusLG,
-            height: "calc(100vh - 120px)",
-            overflow: "auto",
-            backgroundColor: "#fff",
-          }}
+          className="m-4 mb-0 p-6 bg-white rounded-xl shadow-sm overflow-auto"
+          style={{ height: "calc(100vh - 80px)" }}
         >
           <Routes>
-            <Route path="/" element={<DashboardScreen />} />
+            <Route path={ROUTES.home} element={<DashboardScreen />} />
+            <Route path={ROUTES.item} element={<ItemScreen />} />
+            <Route path={ROUTES.user} element={<UserScreen />} />
+            {/* Add more routes here as needed */}
           </Routes>
         </Content>
       </Layout>
@@ -133,22 +155,21 @@ const App: React.FC = () => {
   );
 };
 
+// App Wrapper with Authentication
 const AppWrapper: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token");
 
   return (
     <Router>
       <Routes>
-        {!isAuthenticated ? (
-          <Route path="/login" element={<LoginScreen />} />
-        ) : (
-          <>
-            <Route path="/*" element={<App />} />
-          </>
-        )}
-        {!isAuthenticated && (
-          <Route path="*" element={<Navigate to="/login" />} />
-        )}
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/" /> : <LoginScreen />}
+        />
+        <Route
+          path="/*"
+          element={isAuthenticated ? <App /> : <Navigate to="/login" />}
+        />
       </Routes>
     </Router>
   );

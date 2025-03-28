@@ -15,8 +15,8 @@ const LoginScreen = () => {
           layout="vertical"
           size="large"
           onFinish={() => {
-            console.log("login");
             window.localStorage.setItem("token", "123");
+            window.location.href = "/";
           }}
         >
           <Form.Item

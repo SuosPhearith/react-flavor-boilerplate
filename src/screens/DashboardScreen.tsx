@@ -1,6 +1,6 @@
 const DashboardScreen = () => {
   return (
-    <div>DashboardScreen</div>
+    <div className="bg-red-200 font-semibold">DashboardScreen</div>
   )
 }
 
